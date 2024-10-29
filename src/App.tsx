@@ -2,13 +2,10 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import runFilecoinJs from './lib/main'
+import {} from './lib/main'
 
-async function App() {
+function App() {
   const [count, setCount] = useState(0)
-
-  await runFilecoinJs();
-
   return (
     <>
       <div>
