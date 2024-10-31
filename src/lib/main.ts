@@ -2,9 +2,9 @@ import {
   HttpJsonRpcConnector,
   LotusClient,
   MnemonicWalletProvider,
-  MetamaskWalletProvider,
+  // MetamaskWalletProvider,
 } from 'filecoin.js';
-import { BigNumber } from 'bignumber.js';
+// import { BigNumber } from 'bignumber.js';
 
 const LOTUS_HTTP_RPC_ENDPOINT = 'https://api.calibration.node.glif.io/rpc/v0';
 

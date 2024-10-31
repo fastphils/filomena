@@ -4,6 +4,10 @@ For hacking / pinpointing issues and future developments of filecoin.js
 
 Run `yarn dev --open`
 
+## fil-wallet
+
+Run `vite build` then load `/dist` or `/build` unpacked from the chrome extension manager.
+
 ## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
