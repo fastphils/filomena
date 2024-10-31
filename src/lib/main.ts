@@ -2,11 +2,22 @@ import {
   HttpJsonRpcConnector,
   LotusClient,
   MnemonicWalletProvider,
-  // MetamaskWalletProvider,
 } from 'filecoin.js';
-// import { BigNumber } from 'bignumber.js';
 
 const LOTUS_HTTP_RPC_ENDPOINT = 'https://api.calibration.node.glif.io/rpc/v0';
+
+export function createWallet() {
+  const httpConnector = new HttpJsonRpcConnector(LOTUS_HTTP_RPC_ENDPOINT);
+  const lotusClient = new LotusClient(httpConnector);
+  const hdWalletMnemonic = 'equip ... young';
+  const hdDerivationPath = `m/44'/461'/0/0/0`;
+  const walletProvider = new MnemonicWalletProvider(
+    lotusClient,
+    hdWalletMnemonic,
+    hdDerivationPath
+  );
+  return walletProvider;
+}
 
 (async () => {
   const httpConnector = new HttpJsonRpcConnector(LOTUS_HTTP_RPC_ENDPOINT);
@@ -24,6 +35,8 @@ const LOTUS_HTTP_RPC_ENDPOINT = 'https://api.calibration.node.glif.io/rpc/v0';
   console.log(`Lotus version ${version.Version}`);
   const myAddress = await walletProvider.getDefaultAddress();
   console.log(`Wallet address ${myAddress}`);
+
+  console.log(`network: ${await walletProvider.networkName()}`);
 
   // const message = await walletProvider.createMessage({
   //   To: myAddress,

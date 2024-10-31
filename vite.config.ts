@@ -22,16 +22,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: './index.html',
-        content: './src/scripts/content.ts',
       },
-      // preserveEntrySignatures: 'strict',
-      // output: {
-      //   entryFileNames: '[name].js',
-      //   chunkFileNames: '[name].js',
-      //   assetFileNames: '[name].[ext]',
-      //   // preserveModules: true,
-      //   dir: 'build/assets',
-      // },
     },
   },
 })

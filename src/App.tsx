@@ -1,31 +1,41 @@
 import filomenaLogo from '/filomena128x128.store.png'
 import './App.css'
-import {} from './lib/main'
+import { createWallet } from './lib/main'
+import { useEffect, useState } from 'react'
 
 function App() {
+  let wallet = createWallet();
+  let [address, setAddress] = useState('')
+  let [balance, setBalance] = useState(0)
+  useEffect(() => {
+    wallet.getDefaultAddress().then((address) => {
+      console.log(`Wallet address ${address}`)
+      setAddress(address)
+    })
+    wallet.getBalance(address).then((balance) => {
+      console.log(`Wallet balance ${balance}`)
+      setBalance(balance)
+    })
+  }, [address, wallet])
   return (
-    <>
-      <div>
+    <div className="prose">
+      <div className="flex justify-center">
         <a href="https://vite.dev" target="_blank">
           <img src={filomenaLogo} className="logo" alt="Filomena logo" />
         </a>
-        {/* <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a> */}
       </div>
       <h1>Filomena Wallet</h1>
-      <div className="card">
-       <button className="btn btn-primary btn-small">
+      <p className="badge badge-ghost">{address}</p>
+      <p className="badge badge-ghost">{balance} TFIL</p>
+      <div className="flex justify-center">
+        <button className="btn btn-sm w-24">
           Sign in
         </button>
-        {/* <p>
-          Sign in or <code>src/App.tsx</code> and save to test HMR
-        </p> */}
       </div>
       <p className="read-the-docs">
         Open-source wallet for the Filecoin network.
       </p>
-    </>
+    </div>
   )
 }
 
