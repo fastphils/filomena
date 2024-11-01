@@ -5,8 +5,9 @@ import { HttpJsonRpcConnector, MnemonicWalletProvider } from 'filecoin.js'
 import AddressInput from './components/AddressInput'
 import BadgedButton from './components/BadgedButton'
 import FilInput from './components/AmountInput'
+import BigNumber from 'bignumber.js'
 
-const LOTUS_HTTP_RPC_ENDPOINT = 'https://api.calibration.node.glif.io/rpc/v0';
+const LOTUS_HTTP_RPC_ENDPOINT = 'https://api.calibration.node.glif.io/rpc/v0'
 
 export function createWallet() {
   console.log('create wallet')
@@ -23,29 +24,58 @@ export function createWallet() {
   return walletProvider;
 }
 
-function App() {
+export default function App() {
   let wallet = createWallet();
-  let [address, setAddress] = useState('')
+  let [fromAddress, setFromAddress] = useState('')
+  let [toAddress, setToAddress] = useState('')
   let [balance, setBalance] = useState(0)
   let [amount, setAmount] = useState(0)
 
-  const handleInput = (e: any) => {
+  const handleAddressInput = (e: any) => {
+    setToAddress(e.target.value)
+    console.log(`new address ${toAddress}`)
+  }
+
+  const handleAmountInput = (e: any) => {
     setAmount(e.target.value)
     console.log(`new amount ${amount}`)
   };
 
+  const sendFIL = async () => {
+    console.log(`sending ${amount} to ${fromAddress}`)
+    try {
+        const payment = new BigNumber(amount)
+      const gasLimit = 1000000
+      const nonce = await wallet.getNonce(fromAddress)
+      const message = await wallet.createMessage({
+        From: fromAddress,
+        To: toAddress,
+        Value: payment,
+        GasLimit: gasLimit,
+        Method: 0,
+        Nonce: nonce,
+      })
+      const signedMessage = await wallet.signMessage(message)
+      const txhash = await wallet.sendSignedMessage(signedMessage)
+      console.log(`Transaction sent with hash: ${txhash}`)
+    } catch (error: any) {
+      console.error(`Error sending FIL: ${error.message}`)
+    }
+  }
+
   useEffect(() => {
     const f = async () => {
-      let address = await wallet.getDefaultAccount();
-      console.log(`Wallet address ${address}`)
-      setAddress(address)
+      let fromAddress = await wallet.getDefaultAccount();
+      console.log(`Wallet address ${fromAddress}`)
+      setFromAddress(fromAddress)
 
-      let balance = await wallet.getBalance(address)
+      let balance = await wallet.getBalance(fromAddress)
       console.log(`Wallet balance ${balance}`)
       setBalance(balance)
     }
     f()
   }, [])
+
   return (
     <div className="prose">
       <div className="flex justify-center">
@@ -57,13 +87,17 @@ function App() {
       <div className="card card-bordered flex justify-center">
         <div className="card-body">
           <h3 className="card-title justify-center">Address</h3>
-          <kbd className="kbd kbd-md">{address}</kbd>
+          <kbd className="kbd kbd-md">{fromAddress}</kbd>
           <h3 className="card-title justify-center">Balance</h3>
           <kbd className="kbd kbd-md">{balance}</kbd>
-          <AddressInput />
-          <FilInput data={amount} onChange={handleInput} />
+          <AddressInput data={toAddress} onChange={handleAddressInput} />
+          <FilInput data={amount} onChange={handleAmountInput} />
           <div className="card-actions justify-center">
-            <BadgedButton data={amount} action="Send" />
+            <BadgedButton
+              data={amount}
+              action="Send"
+              onClick={() => sendFIL()}
+            />
           </div>
         </div>
       </div>
@@ -73,5 +107,3 @@ function App() {
     </div>
   )
 }
-
-export default App

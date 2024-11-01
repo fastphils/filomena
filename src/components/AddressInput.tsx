@@ -1,8 +1,14 @@
 import { IconWallet } from '@tabler/icons-react'
 
-export default () => (
+export default ({ data, onChange }: AddressInputProps) => (
   <label className="input input-bordered flex items-center gap-2">
-    <input type="text" className="grow" placeholder="Address" />
+    <input
+      type="text"
+      className="grow"
+      placeholder="Address"
+      value={data}
+      onChange={onChange}
+    />
     <IconWallet
       size={24}
       color="gray"
@@ -11,3 +17,8 @@ export default () => (
     />
   </label>
 )
+
+type AddressInputProps = { 
+  data: string,
+  onChange: (e: any) => void,
+}
