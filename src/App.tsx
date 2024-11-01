@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { HttpJsonRpcConnector, MnemonicWalletProvider } from 'filecoin.js'
 import AddressInput from './components/AddressInput'
 import BadgedButton from './components/BadgedButton'
+import AddButton from './components/AddButton'
 import FilInput from './components/AmountInput'
 import BigNumber from 'bignumber.js'
 
@@ -87,9 +88,10 @@ export default function App() {
       <div className="card card-bordered flex justify-center">
         <div className="card-body">
           <h3 className="card-title justify-center">Address</h3>
-          <kbd className="kbd kbd-md">{fromAddress}</kbd>
+          <kbd className="kbd kbd-lg">{fromAddress}</kbd>
+          <AddButton />
           <h3 className="card-title justify-center">Balance</h3>
-          <kbd className="kbd kbd-md">{balance}</kbd>
+          <kbd className="kbd kbd-lg">{balance}</kbd>
           <AddressInput data={toAddress} onChange={handleAddressInput} />
           <FilInput data={amount} onChange={handleAmountInput} />
           <div className="card-actions justify-center">
