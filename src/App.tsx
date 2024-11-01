@@ -7,6 +7,7 @@ import BadgedButton from './components/BadgedButton'
 import AddButton from './components/AddButton'
 import FilInput from './components/AmountInput'
 import BigNumber from 'bignumber.js'
+import Alert from './components/Alert'
 
 const LOTUS_HTTP_RPC_ENDPOINT = 'https://api.calibration.node.glif.io/rpc/v0'
 
@@ -34,6 +35,7 @@ export default function App() {
   let [balance, setBalance] = useState(0)
   let [amount, setAmount] = useState(0)
   let [count, setCount] = useState(0)
+  let [cid, setCid] = useState('')
 
   const handleAddressInput = (e: any) => {
     let newAddress = e.target.value
@@ -79,6 +81,11 @@ export default function App() {
       const signedMessage = await wallet.signMessage(message)
       const txhash = await wallet.sendSignedMessage(signedMessage)
       console.log(`Transaction sent with hash: ${txhash}`)
+      setAmount(0)
+      setCid(txhash.toString())
+      setTimeout(() => {
+        setCid('')
+      }, 5000)
     } catch (error: any) {
       console.error(`Error sending FIL: ${error.message}`)
     }
@@ -99,6 +106,7 @@ export default function App() {
 
   return (
     <div className="prose">
+      {cid !== '' ? <Alert data={cid} /> : null}
       <div className="flex justify-center">
         <a href="https://vite.dev" target="_blank">
           <img src={filomenaLogo} className="logo" alt="Filomena logo" />
@@ -115,7 +123,7 @@ export default function App() {
             ))
           }
 
-          <AddButton onClick={() => addAddress()} />
+          {/* <AddButton onClick={() => addAddress()} /> */}
           <h3 className="card-title justify-center">Balance</h3>
           <kbd className="kbd kbd-lg">{balance}</kbd>
           <AddressInput data={toAddress} onChange={handleAddressInput} />
