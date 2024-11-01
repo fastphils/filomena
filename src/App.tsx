@@ -1,22 +1,41 @@
 import filomenaLogo from '/filomena128x128.store.png'
 import './App.css'
-import { createWallet } from './lib/main'
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
+import { HttpJsonRpcConnector, MnemonicWalletProvider } from 'filecoin.js'
+
+const LOTUS_HTTP_RPC_ENDPOINT = 'https://api.calibration.node.glif.io/rpc/v0';
+
+export function createWallet() {
+  console.log('create wallet')
+  const connector = new HttpJsonRpcConnector(LOTUS_HTTP_RPC_ENDPOINT);
+  const hdWalletMnemonic = 'equip ... young';
+  const hdWalletPassword = '...';
+  const hdDerivationPath = `m/44'/461'/0/0/0`;
+  const walletProvider = new MnemonicWalletProvider(
+    connector,
+    hdWalletMnemonic,
+    hdWalletPassword,
+    hdDerivationPath,
+  );
+  return walletProvider;
+}
 
 function App() {
   let wallet = createWallet();
   let [address, setAddress] = useState('')
   let [balance, setBalance] = useState(0)
   useEffect(() => {
-    wallet.getDefaultAddress().then((address) => {
+    const f = async () => {
+      let address = await wallet.getDefaultAccount();
       console.log(`Wallet address ${address}`)
       setAddress(address)
-    })
-    wallet.getBalance(address).then((balance) => {
+
+      let balance = await wallet.getBalance(address)
       console.log(`Wallet balance ${balance}`)
       setBalance(balance)
-    })
-  }, [address, wallet])
+    }
+    f()
+  }, [])
   return (
     <div className="prose">
       <div className="flex justify-center">
