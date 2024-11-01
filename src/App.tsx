@@ -27,14 +27,32 @@ export function createWallet() {
 
 export default function App() {
   let wallet = createWallet();
+  let initAddresses: Array<string> = []
   let [fromAddress, setFromAddress] = useState('')
   let [toAddress, setToAddress] = useState('')
+  let [addresses, setAddresses] = useState(initAddresses)
   let [balance, setBalance] = useState(0)
   let [amount, setAmount] = useState(0)
+  let [count, setCount] = useState(0)
 
   const handleAddressInput = (e: any) => {
-    setToAddress(e.target.value)
-    console.log(`new address ${toAddress}`)
+    let newAddress = e.target.value
+    setToAddress(newAddress)
+    console.log(`new address ${newAddress}`)
+  }
+
+  const addAddress = async () => {
+    try {
+      setCount(count + 1)
+      let _addresses: Array<string> = await wallet.getAccounts()
+      console.log(`Getting new addresses: ${_addresses[count]}`)
+      setAddresses([
+        ...addresses,
+        _addresses[count],
+      ])
+    } catch (error: any) {
+      console.error(`Error adding address: ${error.message}`)
+    }
   }
 
   const handleAmountInput = (e: any) => {
@@ -43,15 +61,17 @@ export default function App() {
   };
 
   const sendFIL = async () => {
-    console.log(`sending ${amount} to ${fromAddress}`)
+    console.log(`sending ${amount} to ${toAddress}`)
     try {
-        const payment = new BigNumber(amount)
-      const gasLimit = 1000000
+      const payment = new BigNumber(amount)
+      const gasLimit = 100000000
+      const gasCap = new BigNumber(1000000000)
       const nonce = await wallet.getNonce(fromAddress)
       const message = await wallet.createMessage({
         From: fromAddress,
         To: toAddress,
         Value: payment,
+        GasFeeCap: gasCap,
         GasLimit: gasLimit,
         Method: 0,
         Nonce: nonce,
@@ -88,8 +108,14 @@ export default function App() {
       <div className="card card-bordered flex justify-center">
         <div className="card-body">
           <h3 className="card-title justify-center">Address</h3>
-          <kbd className="kbd kbd-lg">{fromAddress}</kbd>
-          <AddButton />
+          <kbd className="kbd kbd-lg kbd-neutral">{fromAddress}</kbd>
+          {
+            addresses.map((address: string, index: number) => (
+              <kbd key={index} className="kbd kbd-lg">{address}</kbd>
+            ))
+          }
+
+          <AddButton onClick={() => addAddress()} />
           <h3 className="card-title justify-center">Balance</h3>
           <kbd className="kbd kbd-lg">{balance}</kbd>
           <AddressInput data={toAddress} onChange={handleAddressInput} />
