@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { HttpJsonRpcConnector, MnemonicWalletProvider } from 'filecoin.js'
 import AddressInput from './components/AddressInput'
 import BadgedButton from './components/BadgedButton'
-import AddButton from './components/AddButton'
 import FilInput from './components/AmountInput'
 import BigNumber from 'bignumber.js'
 import Alert from './components/Alert'
@@ -31,10 +30,10 @@ export default function App() {
   let initAddresses: Array<string> = []
   let [fromAddress, setFromAddress] = useState('')
   let [toAddress, setToAddress] = useState('')
-  let [addresses, setAddresses] = useState(initAddresses)
+  let [addresses, _setAddresses] = useState(initAddresses)
   let [balance, setBalance] = useState(0)
   let [amount, setAmount] = useState(0)
-  let [count, setCount] = useState(0)
+  // let [count, setCount] = useState(0)
   let [cid, setCid] = useState('')
 
   const handleAddressInput = (e: any) => {
@@ -43,19 +42,19 @@ export default function App() {
     console.log(`new address ${newAddress}`)
   }
 
-  const addAddress = async () => {
-    try {
-      setCount(count + 1)
-      let _addresses: Array<string> = await wallet.getAccounts()
-      console.log(`Getting new addresses: ${_addresses[count]}`)
-      setAddresses([
-        ...addresses,
-        _addresses[count],
-      ])
-    } catch (error: any) {
-      console.error(`Error adding address: ${error.message}`)
-    }
-  }
+  // const addAddress = async () => {
+  //   try {
+  //     setCount(count + 1)
+  //     let _addresses: Array<string> = await wallet.getAccounts()
+  //     console.log(`Getting new addresses: ${_addresses[count]}`)
+  //     setAddresses([
+  //       ...addresses,
+  //       _addresses[count],
+  //     ])
+  //   } catch (error: any) {
+  //     console.error(`Error adding address: ${error.message}`)
+  //   }
+  // }
 
   const handleAmountInput = (e: any) => {
     setAmount(e.target.value)
@@ -122,15 +121,19 @@ export default function App() {
               <kbd key={index} className="kbd kbd-lg">{address}</kbd>
             ))
           }
-
           {/* <AddButton onClick={() => addAddress()} /> */}
           <h3 className="card-title justify-center">Balance</h3>
-          <kbd className="kbd kbd-lg">{balance}</kbd>
-          <AddressInput data={toAddress} onChange={handleAddressInput} />
+          <kbd 
+            className="kbd kbd-lg"
+            style={{marginBottom: '15px'}}
+          >{balance}</kbd>
+          <AddressInput
+            data={toAddress}
+            onChange={handleAddressInput}
+          />
           <FilInput data={amount} onChange={handleAmountInput} />
           <div className="card-actions justify-center">
             <BadgedButton
-              data={amount}
               action="Send"
               onClick={() => sendFIL()}
             />

@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/button.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/addressinput.tsx","./src/components/amountinput.tsx","./src/components/badgedbutton.tsx"],"version":"5.6.3"}
+{"root":["./src/app.tsx","./src/button.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/addbutton.tsx","./src/components/addressinput.tsx","./src/components/alert.tsx","./src/components/amountinput.tsx","./src/components/badgedbutton.tsx"],"version":"5.6.3"}

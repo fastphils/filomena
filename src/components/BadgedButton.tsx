@@ -1,6 +1,6 @@
 import { IconSend2 } from '@tabler/icons-react'
 
-export default ({ action, data, onClick }: BadgedButtonProps) => (
+export default ({ action, onClick }: BadgedButtonProps) => (
   <button className="btn btn-block" onClick={onClick}>
     {action}
     <IconSend2 size={24} color="gray" stroke={1} strokeLinejoin="miter" />
@@ -9,7 +9,6 @@ export default ({ action, data, onClick }: BadgedButtonProps) => (
 )
 
 export type BadgedButtonProps = {
-  data: number,
   action: string,
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void
 }
