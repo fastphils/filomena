@@ -7,6 +7,10 @@ import BadgedButton from './components/BadgedButton'
 import FilInput from './components/AmountInput'
 import BigNumber from 'bignumber.js'
 import Alert from './components/Alert'
+import { Token } from 'iso-filecoin'
+import { signMessage, create } from 'iso-filecoin/wallet'
+import { RPC } from 'iso-filecoin/rpc'
+import { Message } from 'iso-filecoin/message'
 
 const LOTUS_HTTP_RPC_ENDPOINT = 'https://api.calibration.node.glif.io/rpc/v0'
 
@@ -16,17 +20,28 @@ export function createWallet() {
   const hdWalletMnemonic = 'equip ... young';
   const hdWalletPassword = '...';
   const hdDerivationPath = `m/44'/461'/0/0/0`;
-  const walletProvider = new MnemonicWalletProvider(
-    connector,
-   hdWalletMnemonic,
-    hdWalletPassword,
-    hdDerivationPath,
-  );
+
+  // const walletProvider = new MnemonicWalletProvider(
+  //   connector,
+  //  hdWalletMnemonic,
+  //   hdWalletPassword,
+  //   hdDerivationPath,
+  // );
+
+  // const walletProvider = Wallet.accountFromMnemonic(
+  //   hdWalletMnemonic,
+  //   "SECP256K1",
+  //   hdDerivationPath,
+  //   hdWalletPassword,
+  //   "testnet",
+  // )
+  const walletProvider = create("BLS", "testnet")
   return walletProvider;
 }
 
 export default function App() {
   let wallet = createWallet();
+  let rpc = new RPC({api: LOTUS_HTTP_RPC_ENDPOINT})
   let initAddresses: Array<string> = []
   let [fromAddress, setFromAddress] = useState('')
   let [toAddress, setToAddress] = useState('')
@@ -64,24 +79,38 @@ export default function App() {
   const sendFIL = async () => {
     console.log(`sending ${amount} to ${toAddress}`)
     try {
-      const payment = new BigNumber(amount)
-      const gasLimit = 100000000
-      const gasCap = new BigNumber(1000000000)
-      const nonce = await wallet.getNonce(fromAddress)
-      const message = await wallet.createMessage({
-        From: fromAddress,
-        To: toAddress,
-        Value: payment,
-        GasFeeCap: gasCap,
-        GasLimit: gasLimit,
-        Method: 0,
-        Nonce: nonce,
+      // const payment = new BigNumber(amount)
+      // const gasLimit = 100000000
+      // const gasCap = new BigNumber(1000000000)
+      // const nonce = await wallet.getNonce(fromAddress)
+
+      const message = new Message({
+        from: fromAddress,
+        gasFeeCap: '1000000000',
+        gasLimit: 100000000,
+        gasPremium: '1000000000',
+        method: 0,
+        nonce: 0,
+        to: fromAddress,
+        value: amount.toString(),
+        version: 0,
       })
-      const signedMessage = await wallet.signMessage(message)
-      const txhash = await wallet.sendSignedMessage(signedMessage)
-      console.log(`Transaction sent with hash: ${txhash}`)
+
+      // const message = await wallet.createMessage({
+      //   From: fromAddress,
+      //   To: toAddress,
+      //   Value: payment,
+      //   GasFeeCap: gasCap,
+      //   GasLimit: gasLimit,
+      //   Method: 0,
+      //   Nonce: nonce,
+      // })
+      const pk = wallet.privateKey
+      const signature = await signMessage(pk, "BLS", message)
+      // const txhash = await wallet.sendSignedMessage(signedMessage)
+      console.log(`Transaction sent with hash: ${signature}`)
       setAmount(0)
-      setCid(txhash.toString())
+      setCid(signature.toString())
       setTimeout(() => {
         setCid('')
       }, 5000)
@@ -92,13 +121,15 @@ export default function App() {
 
   useEffect(() => {
     const f = async () => {
-      let fromAddress = await wallet.getDefaultAccount();
+      // let fromAddress = await wallet.getDefaultAccount();
+      let fromAddress = await wallet.address
       console.log(`Wallet address ${fromAddress}`)
-      setFromAddress(fromAddress)
+      setFromAddress(fromAddress.toString())
 
-      let balance = await wallet.getBalance(fromAddress)
-      console.log(`Wallet balance ${balance}`)
-      setBalance(balance)
+      // let balance = await wallet.getBalance(fromAddress)
+      let balance = await rpc.balance(fromAddress.toString())
+      console.log(`Wallet balance ${balance.result}`)
+      setBalance(balance.result ? Number(balance.result) :  0)
     }
     f()
   }, [])
@@ -123,7 +154,7 @@ export default function App() {
           }
           {/* <AddButton onClick={() => addAddress()} /> */}
           <h3 className="card-title justify-center">Balance</h3>
-          <kbd 
+          <kbd
             className="kbd kbd-lg"
             style={{marginBottom: '15px'}}
           >{balance}</kbd>
